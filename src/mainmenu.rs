@@ -92,11 +92,29 @@ fn setup(
     .insert(Name::new("image"));
 }
 
+fn update(
+    mouse_event: Res<ButtonInput<MouseButton>>,
+    mainmenu_query: Query<Entity, With<Mainmenu>>,
+    mut commands: Commands,
+    mut app_state: ResMut<NextState<AppState>>,
+) {
+    if mouse_event.just_pressed(MouseButton::Left) {
+        println!("mainmenu: mouse clicked");
+        println!("mainmenu: despawned entities");
+        for mainmenu_entity in mainmenu_query.iter() {
+            commands.entity(mainmenu_entity).despawn();
+        }
+        println!("mainmenu: moved mainmenu -> ingame");
+        app_state.set(AppState::Ingame);
+    }
+}
+
 pub struct MainmenuPlugin;
 
 impl Plugin for MainmenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Mainmenu), setup);
+            .add_systems(OnEnter(AppState::Mainmenu), setup)
+            .add_systems(Update, update.run_if(in_state(AppState::Mainmenu)));
     }
 }
