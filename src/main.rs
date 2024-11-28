@@ -19,6 +19,8 @@ enum AppState {
     Mainmenu,
     Ingame,
     Pause,
+    Gameclear,
+    Gameover,
 }
 
 #[derive(Default)]

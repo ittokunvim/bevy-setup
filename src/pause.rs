@@ -15,7 +15,7 @@ const IMAGE_SIZE: u32 = 64;
 const SIZE: f32 = 32.0;
 
 #[derive(Default, Component, Debug)]
-struct PauseButton {
+pub struct PauseButton {
     first: usize,
     last: usize,
 }
