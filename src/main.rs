@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 mod mainmenu;
 
-const GAMETITLE: &str = "Bevyセットアップコード";
+const GAMETITLE: &str = "Bevyセットアップ";
 const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const PATH_FONT: &str = "fonts/misaki_gothic.ttf";
