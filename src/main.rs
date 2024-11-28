@@ -8,6 +8,12 @@ const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const PATH_FONT: &str = "fonts/misaki_gothic.ttf";
 const PATH_SOUND_BGM: &str = "sounds/bgm.ogg";
 
+#[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
+enum AppState {
+    #[default]
+    Mainmenu,
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins
@@ -20,6 +26,7 @@ fn main() {
                 ..Default::default()
             })
         )
+        .init_state::<AppState>()
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .add_systems(Startup, setup)

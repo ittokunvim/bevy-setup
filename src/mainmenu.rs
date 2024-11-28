@@ -4,6 +4,7 @@ use crate::{
     GAMETITLE,
     WINDOW_SIZE,
     PATH_FONT,
+    AppState,
 };
 
 const GAMETITLE_FONT_SIZE: f32 = 32.0;
@@ -42,6 +43,6 @@ pub struct MainmenuPlugin;
 impl Plugin for MainmenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Startup, setup);
+            .add_systems(OnEnter(AppState::Mainmenu), setup);
     }
 }
