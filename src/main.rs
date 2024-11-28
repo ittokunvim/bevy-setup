@@ -2,12 +2,14 @@ use bevy::prelude::*;
 
 mod mainmenu;
 mod ingame;
+mod pause;
 
 const GAMETITLE: &str = "Bevyセットアップ";
 const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const PATH_FONT: &str = "fonts/misaki_gothic.ttf";
 const PATH_IMAGE_MAINMENU: &str = "images/mainmenu.png";
+const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton.png";
 const PATH_SOUND_BGM: &str = "sounds/bgm.ogg";
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
@@ -35,6 +37,7 @@ fn main() {
         .add_systems(Startup, setup)
         .add_plugins(mainmenu::MainmenuPlugin)
         .add_plugins(ingame::IngamePlugin)
+        .add_plugins(pause::PausePlugin)
         .run();
 }
 
