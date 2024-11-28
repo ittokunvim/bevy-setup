@@ -4,6 +4,7 @@ use crate::{
     GAMETITLE,
     WINDOW_SIZE,
     PATH_FONT,
+    PATH_IMAGE_MAINMENU,
     AppState,
 };
 
@@ -36,6 +37,16 @@ fn setup(
         Mainmenu,
     ))
     .insert(Name::new("gametitle"));
+    println!("mainmenu: setup image");
+    commands.spawn((
+        SpriteBundle {
+            texture: asset_server.load(PATH_IMAGE_MAINMENU),
+            transform: Transform::from_xyz(0.0, 0.0, -10.0),
+            ..default()
+        },
+        Mainmenu,
+    ))
+    .insert(Name::new("image"));
 }
 
 pub struct MainmenuPlugin;
