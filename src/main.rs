@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 mod mainmenu;
+mod ingame;
 
 const GAMETITLE: &str = "Bevyセットアップ";
 const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
@@ -13,6 +14,7 @@ const PATH_SOUND_BGM: &str = "sounds/bgm.ogg";
 enum AppState {
     #[default]
     Mainmenu,
+    Ingame,
 }
 
 fn main() {
@@ -32,6 +34,7 @@ fn main() {
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .add_systems(Startup, setup)
         .add_plugins(mainmenu::MainmenuPlugin)
+        .add_plugins(ingame::IngamePlugin)
         .run();
 }
 
