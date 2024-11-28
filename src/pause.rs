@@ -1,7 +1,11 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    window::PrimaryWindow,
+};
 
 use crate::{
     WINDOW_SIZE,
+    CURSOR_RANGE,
     PATH_IMAGE_PAUSEBUTTON,
     AppState,
 };
@@ -12,6 +16,7 @@ const SIZE: f32 = 32.0;
 #[derive(Default, Component, Debug)]
 struct PauseButton {
     first: usize,
+    last: usize,
 }
 
 fn setup(
@@ -22,7 +27,7 @@ fn setup(
     println!("pause: setup pausebutton");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let animation_indices = PauseButton { first: 0 };
+    let animation_indices = PauseButton { first: 0, last: 1, };
     let pos = Vec3::new(
         WINDOW_SIZE.x / 2.0 - SIZE,
         -WINDOW_SIZE.y / 2.0 + SIZE,
@@ -48,11 +53,46 @@ fn setup(
     .insert(Name::new("pausebutton"));
 }
 
+fn update(
+    mouse_event: Res<ButtonInput<MouseButton>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    mut query: Query<(&Transform, &PauseButton, &mut TextureAtlas), With<PauseButton>>,
+    mut app_state: ResMut<NextState<AppState>>,
+) {
+    if !mouse_event.just_pressed(MouseButton::Left) { return; }
+
+    let window = window_query.single();
+    let mut cursor_pos = window.cursor_position().unwrap();
+    let Ok((transform, prop, mut atlas)) = query.get_single_mut() else { return; };
+    let pausebutton_pos = transform.translation.truncate();
+    // get cursor position
+    cursor_pos = Vec2::new(
+        cursor_pos.x - WINDOW_SIZE.x / 2.0,
+        -cursor_pos.y + WINDOW_SIZE.y / 2.0
+    );
+
+    let distance = cursor_pos.distance(pausebutton_pos);
+
+    if distance < SIZE - CURSOR_RANGE {
+        println!("pausebutton clicked");
+        if atlas.index == prop.first {
+            println!("pause: moved ingame -> pause");
+            atlas.index = prop.last;
+            app_state.set(AppState::Pause);
+        } else {
+            println!("pause: moved pause -> ingame");
+            atlas.index = prop.first;
+            app_state.set(AppState::Ingame);
+        }
+    }
+}
+
 pub struct PausePlugin;
 
 impl Plugin for PausePlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Ingame), setup);
+            .add_systems(OnEnter(AppState::Ingame), setup)
+            .add_systems(Update, update.run_if(in_state(AppState::Ingame)));
     }
 }
