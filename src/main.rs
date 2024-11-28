@@ -21,6 +21,11 @@ enum AppState {
     Pause,
 }
 
+#[derive(Default)]
+struct Config {
+    setup: bool,
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins

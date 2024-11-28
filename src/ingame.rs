@@ -4,6 +4,7 @@ use crate::{
     WINDOW_SIZE,
     PATH_FONT,
     AppState,
+    Config,
 };
 
 const INGAME_FONT_SIZE: f32 = 32.0;
@@ -15,8 +16,12 @@ struct Ingame;
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    config: &mut Config,
 ) {
-    println!("ingame: setup text");
+    if config.setup { return }
+    config.setup = true;
+
+    println!("ingame: setup ingame text");
     commands.spawn((
         TextBundle::from_section(
             "Ingame",
@@ -41,7 +46,14 @@ pub struct IngamePlugin;
 
 impl Plugin for IngamePlugin {
     fn build(&self, app: &mut App) {
+        let mut config = Config { setup: false, };
+
         app
-            .add_systems(OnEnter(AppState::Ingame), setup);
+            .add_systems(
+                OnEnter(AppState::Ingame), move |
+                commands: Commands,
+                asset_server: Res<AssetServer>,
+                | { setup(commands, asset_server, &mut config); }
+            )
     }
 }

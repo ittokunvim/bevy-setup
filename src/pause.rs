@@ -8,6 +8,7 @@ use crate::{
     CURSOR_RANGE,
     PATH_IMAGE_PAUSEBUTTON,
     AppState,
+    Config,
 };
 
 const IMAGE_SIZE: u32 = 64;
@@ -23,7 +24,11 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    config: &mut Config,
 ) {
+    if config.setup { return }
+    config.setup = true;
+
     println!("pause: setup pausebutton");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
@@ -76,11 +81,11 @@ fn update(
     if distance < SIZE - CURSOR_RANGE {
         println!("pausebutton clicked");
         if atlas.index == prop.first {
-            println!("pause: moved ingame -> pause");
+            println!("pause: moved Ingame -> Pause");
             atlas.index = prop.last;
             app_state.set(AppState::Pause);
         } else {
-            println!("pause: moved pause -> ingame");
+            println!("pause: moved Pause -> Ingame");
             atlas.index = prop.first;
             app_state.set(AppState::Ingame);
         }
@@ -91,8 +96,17 @@ pub struct PausePlugin;
 
 impl Plugin for PausePlugin {
     fn build(&self, app: &mut App) {
+        let mut config = Config { setup: false };
+
         app
-            .add_systems(OnEnter(AppState::Ingame), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Ingame)));
+            .add_systems(
+                OnEnter(AppState::Ingame), move |
+                commands: Commands,
+                asset_server: Res<AssetServer>,
+                texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+                | { setup(commands, asset_server, texture_atlas_layouts, &mut config); }
+            )
+            .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
+            .add_systems(Update, update.run_if(in_state(AppState::Pause)));
     }
 }

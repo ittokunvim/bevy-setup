@@ -104,7 +104,7 @@ fn update(
         for mainmenu_entity in mainmenu_query.iter() {
             commands.entity(mainmenu_entity).despawn();
         }
-        println!("mainmenu: moved mainmenu -> ingame");
+        println!("mainmenu: moved Mainmenu -> Ingame");
         app_state.set(AppState::Ingame);
     }
 }
