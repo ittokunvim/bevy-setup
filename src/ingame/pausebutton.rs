@@ -29,7 +29,7 @@ fn setup(
     if config.setup { return }
     config.setup = true;
 
-    println!("pause: setup pausebutton");
+    println!("ingame: setup pausebutton");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = PauseButton { first: 0, last: 1, };
@@ -79,22 +79,31 @@ fn update(
     let distance = cursor_pos.distance(pausebutton_pos);
 
     if distance < SIZE - CURSOR_RANGE {
-        println!("pausebutton clicked");
+        println!("ingame: pausebutton clicked");
         if atlas.index == prop.first {
-            println!("pause: moved Ingame -> Pause");
+            println!("ingame: moved Ingame -> Pause");
             atlas.index = prop.last;
             app_state.set(AppState::Pause);
         } else {
-            println!("pause: moved Pause -> Ingame");
+            println!("ingame: moved Pause -> Ingame");
             atlas.index = prop.first;
             app_state.set(AppState::Ingame);
         }
     }
 }
 
-pub struct PausePlugin;
+fn despawn_pausebutton(
+    mut commands: Commands,
+    query: Query<Entity, With<PauseButton>>,
+) {
+    let entity = query.single();
+    println!("ingame: despawned pausebutton");
+    commands.entity(entity).despawn();
+}
 
-impl Plugin for PausePlugin {
+pub struct PausebuttonPlugin;
+
+impl Plugin for PausebuttonPlugin {
     fn build(&self, app: &mut App) {
         let mut config = Config { setup: false };
 
@@ -107,6 +116,8 @@ impl Plugin for PausePlugin {
                 | { setup(commands, asset_server, texture_atlas_layouts, &mut config); }
             )
             .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
-            .add_systems(Update, update.run_if(in_state(AppState::Pause)));
+            .add_systems(Update, update.run_if(in_state(AppState::Pause)))
+            .add_systems(OnEnter(AppState::Gameover), despawn_pausebutton)
+            .add_systems(OnEnter(AppState::Gameclear), despawn_pausebutton);
     }
 }
