@@ -4,6 +4,7 @@ mod key;
 mod pausebutton;
 mod scoreboard;
 mod text;
+mod timer;
 
 pub struct IngamePlugin;
 
@@ -13,6 +14,7 @@ impl Plugin for IngamePlugin {
             .add_plugins(key::KeyPlugin)
             .add_plugins(pausebutton::PausebuttonPlugin)
             .add_plugins(scoreboard::ScoreBoardPlugin)
-            .add_plugins(text::TextPlugin);
+            .add_plugins(text::TextPlugin)
+            .add_plugins(timer::TimerPlugin);
     }
 }

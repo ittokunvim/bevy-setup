@@ -8,6 +8,7 @@ const GAMETITLE: &str = "Bevyセットアップ";
 const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const CURSOR_RANGE: f32 = 10.0;
+const GAMETIME_LIMIT: f32 = 10.0;
 const PATH_FONT: &str = "fonts/misaki_gothic.ttf";
 const PATH_IMAGE_MAINMENU: &str = "images/mainmenu.png";
 const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton.png";
@@ -31,6 +32,9 @@ struct Config {
 #[derive(Resource, Deref, DerefMut)]
 struct Score(pub usize);
 
+#[derive(Resource)]
+struct GameTimer(Timer);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins
@@ -48,6 +52,9 @@ fn main() {
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .insert_resource(Config { setup_ingame: true })
         .insert_resource(Score(0))
+        .insert_resource(GameTimer(
+            Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)
+        ))
         .add_systems(Startup, setup)
         .add_plugins(mainmenu::MainmenuPlugin)
         .add_plugins(ingame::IngamePlugin)
