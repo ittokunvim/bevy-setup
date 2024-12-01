@@ -25,7 +25,7 @@ fn setup(
 ) {
     if !config.setup_ingame { return }
 
-    println!("ingame: setup ingame text");
+    println!("text: setup ingame text");
     commands.spawn((
         TextBundle::from_section(
             INGAME_TEXT,
@@ -44,7 +44,7 @@ fn setup(
         IngameText,
     ))
     .insert(Name::new("ingametext"));
-    println!("ingame: setup gameover text");
+    println!("text: setup gameover text");
     commands.spawn((
         TextBundle::from_section(
             GAMEOVER_TEXT,
@@ -63,7 +63,7 @@ fn setup(
         IngameText,
     ))
     .insert(Name::new("gameovertext"));
-    println!("ingame: setup gameclear text");
+    println!("text: setup gameclear text");
     commands.spawn((
         TextBundle::from_section(
             GAMECLEAR_TEXT,
@@ -88,7 +88,7 @@ fn despawn_ingametext(
     mut commands: Commands,
     query: Query<Entity, With<IngameText>>,
 ) {
-    println!("ingame: despawned ingametext");
+    println!("text: despawned");
     for entity in query.iter() {
         commands.entity(entity).despawn();
     }
