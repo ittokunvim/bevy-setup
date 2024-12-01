@@ -18,13 +18,13 @@ enum AppState {
     Mainmenu,
     Ingame,
     Pause,
-    Gameclear,
     Gameover,
+    Gameclear,
 }
 
-#[derive(Default)]
+#[derive(Resource, Deref, DerefMut, Debug)]
 struct Config {
-    setup: bool,
+    setup_ingame: bool,
 }
 
 fn main() {
@@ -42,6 +42,7 @@ fn main() {
         .init_state::<AppState>()
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
+        .insert_resource(Config { setup_ingame: true })
         .add_systems(Startup, setup)
         .add_plugins(mainmenu::MainmenuPlugin)
         .add_plugins(ingame::IngamePlugin)
