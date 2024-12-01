@@ -84,25 +84,6 @@ fn setup(
     .insert(Name::new("gamecleartext"));
 }
 
-fn update(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut app_state: ResMut<NextState<AppState>>,
-) {
-    let mut closure = |key: &KeyCode, next_state: AppState| {
-        println!("ingame: {:?} just pressed", key);
-        println!("ingame: moved Ingame -> {:?}", next_state);
-        app_state.set(next_state);
-    };
-
-    for key in keyboard_input.get_just_pressed() {
-        match key {
-            KeyCode::KeyA => closure(key, AppState::Gameover),
-            KeyCode::KeyD => closure(key, AppState::Gameclear),
-            _ => {},
-        }
-    }
-}
-
 fn despawn_ingametext(
     mut commands: Commands,
     query: Query<Entity, With<IngameText>>,
@@ -119,7 +100,6 @@ impl Plugin for TextPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
             .add_systems(OnEnter(AppState::Gameover), despawn_ingametext)
             .add_systems(OnEnter(AppState::Gameclear), despawn_ingametext);
     }
