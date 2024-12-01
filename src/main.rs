@@ -28,6 +28,9 @@ struct Config {
     setup_ingame: bool,
 }
 
+#[derive(Resource, Deref, DerefMut)]
+struct Score(pub usize);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins
@@ -44,6 +47,7 @@ fn main() {
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .insert_resource(Config { setup_ingame: true })
+        .insert_resource(Score(0))
         .add_systems(Startup, setup)
         .add_plugins(mainmenu::MainmenuPlugin)
         .add_plugins(ingame::IngamePlugin)

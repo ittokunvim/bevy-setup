@@ -5,12 +5,14 @@ use crate::{
     PATH_FONT,
     AppState,
     Config,
+    Score,
 };
 
-const GAMEOVER_TEXT: &str = "Game Over";
+const GAMEOVER_TEXT: &str = "ゲームオーバー";
 const GAMEOVER_FONT_SIZE: f32 = 32.0;
-const RETRY_TEXT: &str = "Retry: Key[R]";
-const BACKTOTITLE_TEXT: &str = "Back To Title: Key[B]";
+const SCORE_TEXT: &str = "スコア: ";
+const RETRY_TEXT: &str = "リトライ: Key[R]";
+const BACKTOTITLE_TEXT: &str = "タイトルに戻る: Key[B]";
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_FONT_SIZE: f32 = 20.0;
 const TEXT_PADDING: f32 = 40.0;
@@ -21,10 +23,11 @@ struct Gameover;
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    score: Res<Score>,
 ) {
     println!("gameover: setup");
     // gameover
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMEOVER_FONT_SIZE / 2.0 - TEXT_PADDING);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMEOVER_FONT_SIZE / 2.0 - TEXT_PADDING * 1.5);
 
     commands.spawn((
         TextBundle::from_section(
@@ -44,8 +47,29 @@ fn setup(
         Gameover,
     ))
     .insert(Name::new("gameover"));
+    // score
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_FONT_SIZE / 2.0 - TEXT_PADDING * 0.5);
+
+    commands.spawn((
+        TextBundle::from_section(
+            format!("{}{}", SCORE_TEXT, **score), 
+            TextStyle {
+                font: asset_server.load(PATH_FONT),
+                font_size: TEXT_FONT_SIZE,
+                color: TEXT_COLOR,
+            }
+        )
+        .with_style(Style {
+            position_type: PositionType::Relative,
+            justify_self: JustifySelf::Center,
+            top,
+            ..Default::default()
+        }),
+        Gameover,
+    ))
+    .insert(Name::new("score"));
     // retry
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_FONT_SIZE / 2.0);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_FONT_SIZE / 2.0 + TEXT_PADDING * 0.5);
 
     commands.spawn((
         TextBundle::from_section(
@@ -57,16 +81,16 @@ fn setup(
             }
         )
         .with_style(Style {
-                position_type: PositionType::Relative,
-                justify_self: JustifySelf::Center,
-                top,
-                ..Default::default()
-            }),
+            position_type: PositionType::Relative,
+            justify_self: JustifySelf::Center,
+            top,
+            ..Default::default()
+        }),
         Gameover,
     ))
     .insert(Name::new("retry"));
     // back to title
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_FONT_SIZE / 2.0 + TEXT_PADDING);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_FONT_SIZE / 2.0 + TEXT_PADDING * 1.5);
 
     commands.spawn((
         TextBundle::from_section(
@@ -78,11 +102,11 @@ fn setup(
             }
         )
         .with_style(Style {
-                position_type: PositionType::Relative,
-                justify_self: JustifySelf::Center,
-                top,
-                ..Default::default()
-            }),
+            position_type: PositionType::Relative,
+            justify_self: JustifySelf::Center,
+            top,
+            ..Default::default()
+        }),
         Gameover,
     ))
     .insert(Name::new("backtotitle"));
