@@ -4,12 +4,12 @@ use crate::AppState;
 
 fn update(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut app_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
-    let mut closure = |key: &KeyCode, next_state: AppState| {
+    let mut closure = |key: &KeyCode, app_state: AppState| {
         println!("key: {:?} just pressed", key);
-        println!("key: moved state to {:?} from Ingame", next_state);
-        app_state.set(next_state);
+        println!("key: moved state to {:?} from Ingame", app_state);
+        next_state.set(app_state);
     };
 
     for key in keyboard_input.get_just_pressed() {

@@ -7,15 +7,15 @@ use crate::{
     Config,
 };
 
-const INGAME_TEXT: &str = "Ingame";
+const INGAME_TEXT: &str = "ゲーム中";
 const INGAME_FONT_SIZE: f32 = 32.0;
-const GAMEOVER_TEXT: &str = "Gameover: Key[A]";
-const GAMECLEAR_TEXT: &str = "Gameclear: Key[D]";
+const GAMEOVER_TEXT: &str = "ゲームオーバー: Key[A]";
+const GAMECLEAR_TEXT: &str = "ゲームクリア: Key[D]";
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_FONT_SIZE: f32 = 20.0;
 const TEXT_PADDING: f32 = 40.0;
 
-#[derive(Component, Default, Debug)]
+#[derive(Component)]
 struct IngameText;
 
 fn setup(
@@ -25,7 +25,8 @@ fn setup(
 ) {
     if !config.setup_ingame { return }
 
-    println!("text: setup ingame text");
+    println!("text: setup");
+    // ingame
     commands.spawn((
         TextBundle::from_section(
             INGAME_TEXT,
@@ -43,8 +44,8 @@ fn setup(
         }),
         IngameText,
     ))
-    .insert(Name::new("ingametext"));
-    println!("text: setup gameover text");
+    .insert(Name::new("ingame"));
+    // game over
     commands.spawn((
         TextBundle::from_section(
             GAMEOVER_TEXT,
@@ -62,8 +63,8 @@ fn setup(
         }),
         IngameText,
     ))
-    .insert(Name::new("gameovertext"));
-    println!("text: setup gameclear text");
+    .insert(Name::new("gameover"));
+    // game clear
     commands.spawn((
         TextBundle::from_section(
             GAMECLEAR_TEXT,
@@ -81,10 +82,10 @@ fn setup(
         }),
         IngameText,
     ))
-    .insert(Name::new("gamecleartext"));
+    .insert(Name::new("gameclear"));
 }
 
-fn despawn_ingametext(
+fn despawn_text(
     mut commands: Commands,
     query: Query<Entity, With<IngameText>>,
 ) {
@@ -100,7 +101,7 @@ impl Plugin for TextPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
-            .add_systems(OnEnter(AppState::Gameover), despawn_ingametext)
-            .add_systems(OnEnter(AppState::Gameclear), despawn_ingametext);
+            .add_systems(OnEnter(AppState::Gameover), despawn_text)
+            .add_systems(OnEnter(AppState::Gameclear), despawn_text);
     }
 }

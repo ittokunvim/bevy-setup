@@ -14,7 +14,7 @@ use crate::{
 const IMAGE_SIZE: u32 = 64;
 const SIZE: f32 = 32.0;
 
-#[derive(Default, Component, Debug)]
+#[derive(Component)]
 pub struct PauseButton {
     first: usize,
     last: usize,
@@ -62,7 +62,7 @@ fn update(
     window_query: Query<&Window, With<PrimaryWindow>>,
     mut query: Query<(&Transform, &PauseButton, &mut TextureAtlas), With<PauseButton>>,
     mut config: ResMut<Config>,
-    mut app_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
     if !mouse_event.just_pressed(MouseButton::Left) { return; }
 
@@ -84,14 +84,14 @@ fn update(
             println!("pausebutton: toggled");
             atlas.index = prop.last;
             println!("pausebutton: moved state to Pause from Ingame");
-            app_state.set(AppState::Pause);
+            next_state.set(AppState::Pause);
         } else {
+            println!("pausebutton: change config.setup_ingame to false");
+            config.setup_ingame = false;
             println!("pausebutton: toggled");
             atlas.index = prop.first;
-            println!("pausebutton: changed config setup_ingame is false");
-            config.setup_ingame = false;
             println!("pausebutton: moved state to Ingame from Pause");
-            app_state.set(AppState::Ingame);
+            next_state.set(AppState::Ingame);
         }
     }
 }
@@ -101,7 +101,7 @@ fn despawn_pausebutton(
     query: Query<Entity, With<PauseButton>>,
 ) {
     let entity = query.single();
-    println!("ingame: despawned pausebutton");
+    println!("pausebutton: despawned");
     commands.entity(entity).despawn();
 }
 
