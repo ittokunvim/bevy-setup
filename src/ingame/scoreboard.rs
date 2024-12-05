@@ -10,7 +10,7 @@ use crate::{
 
 const SCORE_TEXT: &str = "スコア: ";
 const TIMER_TEXT: &str = " | タイム: ";
-const TEXT_FONT_SIZE: f32 = 20.0;
+const TEXT_SIZE: f32 = 20.0;
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_PADDING: Val = Val::Px(5.0);
 
@@ -24,32 +24,33 @@ fn setup(
 ) {
     if !config.setup_ingame { return }
 
+    println!("scoreboard: setup");
     commands.spawn((
         TextBundle::from_sections([
             TextSection::new(
                 SCORE_TEXT,
                 TextStyle {
                     font: asset_server.load(PATH_FONT),
-                    font_size: TEXT_FONT_SIZE,
+                    font_size: TEXT_SIZE,
                     color: TEXT_COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: TEXT_FONT_SIZE,
+                font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }),
             TextSection::new(
                 TIMER_TEXT,
                 TextStyle {
                     font: asset_server.load(PATH_FONT),
-                    font_size: TEXT_FONT_SIZE,
+                    font_size: TEXT_SIZE,
                     color: TEXT_COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: TEXT_FONT_SIZE,
+                font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }),
         ])
@@ -74,13 +75,12 @@ fn update(
     text.sections[3].value = timer.0.remaining_secs().round().to_string();
 }
 
-fn despawn_scoreboard(
+fn despawn(
     mut commands: Commands,
     query: Query<Entity, With<ScoreboardUi>>,
 ) {
-    let entity = query.single();
-    println!("scoreboard: despawned");
-    commands.entity(entity).despawn();
+    println!("scoreboard: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
 }
 
 fn score_points(mut score: ResMut<Score>) {
@@ -101,9 +101,10 @@ impl Plugin for ScoreBoardPlugin {
             .add_systems(OnEnter(AppState::Ingame), setup)
             .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
             .add_systems(Update, score_points.run_if(in_state(AppState::Ingame)))
-            .add_systems(OnEnter(AppState::Gameover), despawn_scoreboard)
-            .add_systems(OnEnter(AppState::Gameclear), despawn_scoreboard)
+            .add_systems(OnEnter(AppState::Gameover), despawn)
+            .add_systems(OnEnter(AppState::Gameclear), despawn)
             .add_systems(OnExit(AppState::Gameover), reset_score)
-            .add_systems(OnExit(AppState::Gameclear), reset_score);
+            .add_systems(OnExit(AppState::Gameclear), reset_score)
+        ;
     }
 }

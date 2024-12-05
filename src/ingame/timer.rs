@@ -7,8 +7,8 @@ use crate::{
 
 fn update(
     mut timer: ResMut<GameTimer>,
-    time: Res<Time>,
     mut next_state: ResMut<NextState<AppState>>,
+    time: Res<Time>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
         println!("timer: moved state to Gameover from Ingame");
@@ -28,6 +28,7 @@ impl Plugin for TimerPlugin {
         app
             .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
             .add_systems(OnExit(AppState::Gameover), reset_timer)
-            .add_systems(OnExit(AppState::Gameclear), reset_timer);
+            .add_systems(OnExit(AppState::Gameclear), reset_timer)
+        ;
     }
 }

@@ -11,14 +11,13 @@ use crate::{
     AppState,
 };
 
-const GAMETITLE_FONT_SIZE: f32 = 32.0;
+const GAMETITLE_SIZE: f32 = 32.0;
 const GAMETITLE_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const CLICKSTART_TEXT: &str = "クリックしてスタート";
-const CLICKSTART_FONT_SIZE: f32 = 20.0;
 const CLICKSTART_COLOR: Color = Color::srgb(0.2, 0.2, 0.2);
-const TEXT_PADDING: f32 = 40.0;
-const BOARD_SIZE: Vec2 = Vec2::new(280.0, 210.0);
+const BOARD_SIZE: Vec2 = Vec2::new(320.0, 240.0);
 const BOARD_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const TEXT_SIZE: f32 = 20.0;
 
 #[derive(Component)]
 struct Mainmenu;
@@ -31,14 +30,14 @@ fn setup(
 ) {
     println!("mainmenu: setup");
     // game title
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMETITLE_FONT_SIZE / 2.0 - TEXT_PADDING);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMETITLE_SIZE / 2.0 - BOARD_SIZE.y / 4.0);
 
     commands.spawn((
         TextBundle::from_section(
             GAMETITLE,
             TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: GAMETITLE_FONT_SIZE,
+                font_size: GAMETITLE_SIZE,
                 color: GAMETITLE_COLOR,
             }
         )
@@ -52,14 +51,14 @@ fn setup(
     ))
     .insert(Name::new("gametitle"));
     // click start
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - CLICKSTART_FONT_SIZE / 2.0 + TEXT_PADDING);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0 + BOARD_SIZE.y / 4.0);
 
     commands.spawn((
         TextBundle::from_section(
             CLICKSTART_TEXT, 
             TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: CLICKSTART_FONT_SIZE,
+                font_size: TEXT_SIZE,
                 color: CLICKSTART_COLOR,
             }
         )
@@ -87,7 +86,7 @@ fn setup(
         SpriteBundle {
             texture: asset_server.load(PATH_IMAGE_MAINMENU),
             transform: Transform::from_xyz(0.0, 0.0, -10.0),
-            ..default()
+            ..Default::default()
         },
         Mainmenu,
     ))
@@ -95,20 +94,17 @@ fn setup(
 }
 
 fn update(
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    mainmenu_query: Query<Entity, With<Mainmenu>>,
     mut commands: Commands,
     mut next_state: ResMut<NextState<AppState>>,
+    mouse_events: Res<ButtonInput<MouseButton>>,
+    query: Query<Entity, With<Mainmenu>>,
 ) {
-    if mouse_event.just_pressed(MouseButton::Left) {
-        println!("mainmenu: clicked");
-        println!("mainmenu: despawned");
-        for mainmenu_entity in mainmenu_query.iter() {
-            commands.entity(mainmenu_entity).despawn();
-        }
-        println!("mainmenu: moved state to Ingame from Mainmenu");
-        next_state.set(AppState::Ingame);
-    }
+    if !mouse_events.just_pressed(MouseButton::Left) { return }
+
+    println!("mainmenu: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
+    println!("mainmenu: moved state to Ingame from Mainmenu");
+    next_state.set(AppState::Ingame);
 }
 
 pub struct MainmenuPlugin;
@@ -117,6 +113,7 @@ impl Plugin for MainmenuPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Mainmenu), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Mainmenu)));
+            .add_systems(Update, update.run_if(in_state(AppState::Mainmenu)))
+        ;
     }
 }

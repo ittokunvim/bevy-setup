@@ -8,12 +8,12 @@ use crate::{
 };
 
 const INGAME_TEXT: &str = "ゲーム中";
-const INGAME_FONT_SIZE: f32 = 32.0;
+const INGAME_SIZE: f32 = 32.0;
 const GAMEOVER_TEXT: &str = "ゲームオーバー: Key[A]";
 const GAMECLEAR_TEXT: &str = "ゲームクリア: Key[D]";
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
-const TEXT_FONT_SIZE: f32 = 20.0;
-const TEXT_PADDING: f32 = 40.0;
+const TEXT_SIZE: f32 = 20.0;
+const TEXT_PADDING: f32 = 50.0;
 
 #[derive(Component)]
 struct IngameText;
@@ -32,14 +32,14 @@ fn setup(
             INGAME_TEXT,
             TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: INGAME_FONT_SIZE,
+                font_size: INGAME_SIZE,
                 color: TEXT_COLOR,
             }
         )
         .with_style(Style {
             position_type: PositionType::Relative,
             justify_self: JustifySelf::Center,
-            top: Val::Px(WINDOW_SIZE.y / 2.0 - INGAME_FONT_SIZE / 2.0 - TEXT_PADDING),
+            top: Val::Px(WINDOW_SIZE.y / 2.0 - INGAME_SIZE / 2.0 - TEXT_PADDING),
             ..Default::default()
         }),
         IngameText,
@@ -51,14 +51,14 @@ fn setup(
             GAMEOVER_TEXT,
             TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: TEXT_FONT_SIZE,
+                font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }
         )
         .with_style(Style {
             position_type: PositionType::Relative,
             justify_self: JustifySelf::Center,
-            top: Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_FONT_SIZE / 2.0),
+            top: Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0),
             ..Default::default()
         }),
         IngameText,
@@ -70,14 +70,14 @@ fn setup(
             GAMECLEAR_TEXT,
             TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: TEXT_FONT_SIZE,
+                font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }
         )
         .with_style(Style {
             position_type: PositionType::Relative,
             justify_self: JustifySelf::Center,
-            top: Val::Px(WINDOW_SIZE.y / 2.0 - INGAME_FONT_SIZE / 2.0 + TEXT_PADDING),
+            top: Val::Px(WINDOW_SIZE.y / 2.0 - INGAME_SIZE / 2.0 + TEXT_PADDING),
             ..Default::default()
         }),
         IngameText,
@@ -89,10 +89,8 @@ fn despawn_text(
     mut commands: Commands,
     query: Query<Entity, With<IngameText>>,
 ) {
-    println!("text: despawned");
-    for entity in query.iter() {
-        commands.entity(entity).despawn();
-    }
+    println!("text: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
 }
 
 pub struct TextPlugin;
@@ -102,6 +100,7 @@ impl Plugin for TextPlugin {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
             .add_systems(OnEnter(AppState::Gameover), despawn_text)
-            .add_systems(OnEnter(AppState::Gameclear), despawn_text);
+            .add_systems(OnEnter(AppState::Gameclear), despawn_text)
+        ;
     }
 }

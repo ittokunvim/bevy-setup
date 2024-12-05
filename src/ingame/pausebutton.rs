@@ -13,6 +13,7 @@ use crate::{
 
 const IMAGE_SIZE: u32 = 64;
 const SIZE: f32 = 32.0;
+const PADDING: f32 = 5.0;
 
 #[derive(Component)]
 pub struct PauseButton {
@@ -33,9 +34,9 @@ fn setup(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = PauseButton { first: 0, last: 1, };
     let pos = Vec3::new(
-        WINDOW_SIZE.x / 2.0 - SIZE,
-        -WINDOW_SIZE.y / 2.0 + SIZE,
-        10.0
+        WINDOW_SIZE.x / 2.0 - SIZE / 2.0 - PADDING,
+        -WINDOW_SIZE.y / 2.0 + SIZE / 2.0 + PADDING,
+        99.0
     );
 
     commands.spawn((
@@ -58,19 +59,18 @@ fn setup(
 }
 
 fn update(
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
     mut query: Query<(&Transform, &PauseButton, &mut TextureAtlas), With<PauseButton>>,
     mut config: ResMut<Config>,
     mut next_state: ResMut<NextState<AppState>>,
+    mouse_events: Res<ButtonInput<MouseButton>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
-    if !mouse_event.just_pressed(MouseButton::Left) { return; }
+    if !mouse_events.just_pressed(MouseButton::Left) { return }
 
     let window = window_query.single();
     let mut cursor_pos = window.cursor_position().unwrap();
     let Ok((transform, prop, mut atlas)) = query.get_single_mut() else { return; };
     let pausebutton_pos = transform.translation.truncate();
-    // get cursor position
     cursor_pos = Vec2::new(
         cursor_pos.x - WINDOW_SIZE.x / 2.0,
         -cursor_pos.y + WINDOW_SIZE.y / 2.0
@@ -79,15 +79,16 @@ fn update(
     let distance = cursor_pos.distance(pausebutton_pos);
 
     if distance < SIZE - CURSOR_RANGE {
-        println!("pausebutton: clicked");
         if atlas.index == prop.first {
             println!("pausebutton: toggled");
             atlas.index = prop.last;
             println!("pausebutton: moved state to Pause from Ingame");
             next_state.set(AppState::Pause);
         } else {
-            println!("pausebutton: change config.setup_ingame to false");
-            config.setup_ingame = false;
+            if config.setup_ingame {
+                println!("pausebutton: change config.setup_ingame to false");
+                config.setup_ingame = false;
+            }
             println!("pausebutton: toggled");
             atlas.index = prop.first;
             println!("pausebutton: moved state to Ingame from Pause");
@@ -96,13 +97,12 @@ fn update(
     }
 }
 
-fn despawn_pausebutton(
+fn despawn(
     mut commands: Commands,
     query: Query<Entity, With<PauseButton>>,
 ) {
-    let entity = query.single();
-    println!("pausebutton: despawned");
-    commands.entity(entity).despawn();
+    println!("pausebutton: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
 }
 
 pub struct PausebuttonPlugin;
@@ -113,7 +113,8 @@ impl Plugin for PausebuttonPlugin {
             .add_systems(OnEnter(AppState::Ingame), setup)
             .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
             .add_systems(Update, update.run_if(in_state(AppState::Pause)))
-            .add_systems(OnEnter(AppState::Gameover), despawn_pausebutton)
-            .add_systems(OnEnter(AppState::Gameclear), despawn_pausebutton);
+            .add_systems(OnEnter(AppState::Gameover), despawn)
+            .add_systems(OnEnter(AppState::Gameclear), despawn)
+        ;
     }
 }

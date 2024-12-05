@@ -10,14 +10,14 @@ use crate::{
 };
 
 const GAMECLEAR_TEXT: &str = "ゲームクリア";
-const GAMECLEAR_FONT_SIZE: f32 = 32.0;
+const GAMECLEAR_SIZE: f32 = 32.0;
 const SCORE_TEXT: &str = "スコア: ";
 const TIMER_TEXT: &str = "タイム: ";
 const RETRY_TEXT: &str = "リトライ: Key[R]";
 const BACKTOTITLE_TEXT: &str = "タイトルに戻る: Key[B]";
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_FONT_SIZE: f32 = 20.0;
-const TEXT_PADDING: f32 = 40.0;
+const TEXT_PADDING: f32 = 50.0;
 
 #[derive(Component)]
 struct Gameclear;
@@ -30,14 +30,14 @@ fn setup(
 ) {
     println!("gameclear: setup");
     // gameover
-    let top = WINDOW_SIZE.y / 2.0 - GAMECLEAR_FONT_SIZE / 2.0 - TEXT_PADDING * 2.0;
+    let top = WINDOW_SIZE.y / 2.0 - GAMECLEAR_SIZE / 2.0 - TEXT_PADDING * 2.0;
 
     commands.spawn((
         TextBundle::from_section(
             GAMECLEAR_TEXT, 
             TextStyle {
                 font: asset_server.load(PATH_FONT),
-                font_size: GAMECLEAR_FONT_SIZE,
+                font_size: GAMECLEAR_SIZE,
                 color: TEXT_COLOR,
             }
         )
@@ -137,12 +137,11 @@ fn setup(
 }
 
 fn update(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut config: ResMut<Config>,
     mut next_state: ResMut<NextState<AppState>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
-    let mut closure = |key: &KeyCode, app_state: AppState| {
-        println!("gameclear: {:?} just pressed", key);
+    let mut closure = |app_state: AppState| {
         println!("gameclear: config setup ingame is true");
         config.setup_ingame = true;
         println!("gameclear: moved state to {:?} from Gameclear", app_state);
@@ -151,21 +150,19 @@ fn update(
 
     for key in keyboard_input.get_just_pressed() {
         match key {
-            KeyCode::KeyR => closure(key, AppState::Ingame),
-            KeyCode::KeyB => closure(key, AppState::Mainmenu),
+            KeyCode::KeyR => closure(AppState::Ingame),
+            KeyCode::KeyB => closure(AppState::Mainmenu),
             _ => {},
         }
     }
 }
 
-fn despawn_gameclear(
+fn despawn(
     mut commands: Commands,
     query: Query<Entity, With<Gameclear>>,
 ) {
-    println!("gameclear: despawned");
-    for entity in query.iter() {
-        commands.entity(entity).despawn();
-    }
+    println!("gameclear: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
 }
 
 pub struct GameclearPlugin;
@@ -175,6 +172,7 @@ impl Plugin for GameclearPlugin {
         app
             .add_systems(OnEnter(AppState::Gameclear), setup)
             .add_systems(Update, update.run_if(in_state(AppState::Gameclear)))
-            .add_systems(OnExit(AppState::Gameclear), despawn_gameclear);
+            .add_systems(OnExit(AppState::Gameclear), despawn)
+        ;
     }
 }
